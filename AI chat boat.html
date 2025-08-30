@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paws & Hearts - AI Pet Adoption Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #5a2d82;
+            --secondary-color: #9c64d4;
+            --accent-color: #ff9e5e;
+            --bg-color: #f8f5fc;
+            --text-color: #3a2d46;
+            --bot-bubble: #f3ebff;
+            --user-bubble: #5a2d82;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
+                        url('https://images.unsplash.com/photo-1534361960057-19889db9621e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') no-repeat center center fixed;
+            background-size: cover;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Pet pattern overlay */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M20,50 Q30,30 50,20 Q70,30 80,50 Q70,70 50,80 Q30,70 20,50 Z" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/></svg>');
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .chat-container {
+            width: 380px;
+            height: 600px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: fadeInUp 0.5s forwards;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            z-index: 10;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #3c1b5e 100%);
+            color: white;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            position: relative;
+        }
+
+        .chat-header::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        }
+
+        .logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: white;
+            padding: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header-text {
+            flex: 1;
+        }
+
+        .header-text h3 {
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .header-text p {
+            font-size: 12px;
+            opacity: 0.8;
+            font-weight: 300;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            background: var(--bg-color);
+            scroll-behavior: smooth;
+            background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M20,50 Q30,30 50,20 Q70,30 80,50 Q70,70 50,80 Q30,70 20,50 Z" fill="none" stroke="rgba(156,100,212,0.05)" stroke-width="1"/></svg>');
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            border-radius: 18px;
+            line-height: 1.4;
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+            word-wrap: break-word;
+            box-shadow: var(--shadow);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bot-message {
+            background: var(--bot-bubble);
+            color: var(--text-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            border: 1px solid rgba(156, 100, 212, 0.1);
+        }
+
+        .user-message {
+            background: var(--user-bubble);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #3c1b5e 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .pet-card {
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            margin: 8px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid rgba(156, 100, 212, 0.2);
+        }
+
+        .pet-card img {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .pet-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 4px;
+        }
+
+        .pet-card p {
+            font-size: 12px;
+            color: var(--text-color);
+            margin-bottom: 4px;
+        }
+
+        .pet-card .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 8px;
+        }
+
+        .pet-card .tag {
+            background: rgba(156, 100, 212, 0.1);
+            color: var(--primary-color);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+        }
+
+        .quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 12px;
+            background: white;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .quick-reply {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(156, 100, 212, 0.2);
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            backdrop-filter: blur(4px);
+            color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .quick-reply:hover {
+            background: var(--secondary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(156, 100, 212, 0.2);
+        }
+
+        .quick-reply i {
+            margin-right: 5px;
+            font-size: 12px;
+        }
+
+        .chat-input-container {
+            display: flex;
+            padding: 12px;
+            background: white;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid rgba(156, 100, 212, 0.3);
+            border-radius: 24px;
+            outline: none;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+
+        #user-input:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(156, 100, 212, 0.2);
+            background: white;
+        }
+
+        #send-button {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #3c1b5e 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            margin-left: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(90, 45, 130, 0.2);
+        }
+
+        #send-button:hover {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, #7d4db8 100%);
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(156, 100, 212, 0.3);
+        }
+
+        .typing-indicator {
+            display: flex;
+            padding: 8px 16px;
+            gap: 6px;
+            width: fit-content;
+            background: var(--bot-bubble);
+            border-radius: 18px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(156, 100, 212, 0.1);
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--secondary-color);
+            border-radius: 50%;
+            opacity: 0.4;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingAnimation {
+            0%, 60%, 100% { opacity: 0.4; transform: translateY(0); }
+            30% { opacity: 1; transform: translateY(-4px); }
+        }
+
+        /* Floating decorative elements */
+        .decorative-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 1;
+        }
+
+        .circle-1 {
+            width: 200px;
+            height: 200px;
+            top: -50px;
+            left: -50px;
+            background: radial-gradient(circle, rgba(156, 100, 212, 0.1) 0%, transparent 70%);
+        }
+
+        .circle-2 {
+            width: 300px;
+            height: 300px;
+            bottom: -100px;
+            right: -100px;
+            background: radial-gradient(circle, rgba(255, 158, 94, 0.1) 0%, transparent 70%);
+        }
+
+        .chat-footer {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #3c1b5e 100%);
+            color: white;
+            padding: 8px;
+            text-align: center;
+            font-size: 10px;
+            opacity: 0.8;
+        }
+
+        .chat-footer a {
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Decorative background elements -->
+    <div class="decorative-circle circle-1"></div>
+    <div class="decorative-circle circle-2"></div>
+
+    <!-- Main chat container -->
+    <div class="chat-container">
+        <div class="chat-header">
+            <img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" alt="Paws & Hearts" class="logo">
+            <div class="header-text">
+                <h3>Paws & Hearts</h3>
+                <p>AI Pet Adoption Assistant</p>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chat-messages">
+            <div class="message bot-message">
+                🐾 Welcome to <strong>Paws & Hearts</strong>! I'm your AI pet adoption assistant. I can help you:
+                <ul style="margin-top: 8px; margin-left: 16px;">
+                    <li>Find pets matching your preferences</li>
+                    <li>Learn about pet care</li>
+                    <li>Connect with shelters</li>
+                    <li>Answer adoption questions</li>
+                </ul>
+                How can I help you today?
+            </div>
+            
+            <div class="quick-replies">
+                <button class="quick-reply" onclick="sendQuickReply('Find me a dog')"><i class="fas fa-dog"></i> Find a Dog</button>
+                <button class="quick-reply" onclick="sendQuickReply('Find me a cat')"><i class="fas fa-cat"></i> Find a Cat</button>
+                <button class="quick-reply" onclick="sendQuickReply('What pets are good for apartments?')"><i class="fas fa-home"></i> Apartment Pets</button>
+                <button class="quick-reply" onclick="sendQuickReply('How to prepare for adoption?')"><i class="fas fa-question"></i> Adoption Tips</button>
+            </div>
+        </div>
+
+        <div class="chat-input-container">
+            <input type="text" id="user-input" placeholder="Describe your ideal pet..." onkeypress="handleKeyPress(event)">
+            <button id="send-button" onclick="sendMessage()"><i class="fas fa-paw"></i></button>
+        </div>
+
+        <div class="chat-footer">
+            <a href="#" onclick="showShelterInfo()">Partner Shelters</a> | 
+            <a href="#" onclick="showAdoptionProcess()">Adoption Process</a> | 
+            <a href="#" onclick="showContact()">Contact Us</a>
+        </div>
+    </div>
+
+    <script>
+        // Gemini API Configuration
+        const API_KEY = 'AIzaSyDGtSVDx5MxVgALSxeqWyE_Q9CUs9CWBqo';
+        const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+        
+        // System prompt for the AI pet adoption assistant
+        const SYSTEM_PROMPT = `You are an AI pet adoption assistant for Paws & Hearts. Your role is to:
+        1. Help users find adoptable pets matching their preferences (size, energy level, temperament)
+        2. Provide information about pet care and adoption processes
+        3. Recommend suitable pets based on living situation (apartment, house, family)
+        4. Answer questions about pet behavior and needs
+        5. Connect users with local shelters and rescue organizations
+        
+        Always be compassionate and informative. When suggesting pets, include details like:
+        - Name, age, breed (if known)
+        - Personality traits
+        - Special needs (if any)
+        - Ideal home environment
+        
+        Format pet suggestions as cards with clear information.`;
+
+        // Mock pet database (in a real app, this would come from an API)
+        const PET_DATABASE = {
+            dogs: [
+                {
+                    id: 'd1',
+                    name: 'Buddy',
+                    type: 'Dog',
+                    breed: 'Labrador Mix',
+                    age: '2 years',
+                    gender: 'Male',
+                    size: 'Medium',
+                    energy: 'High',
+                    temperament: ['Friendly', 'Playful', 'Good with kids'],
+                    description: 'Buddy is a lovable lab mix who adores playing fetch and going for long walks. He\'s great with children and other dogs.',
+                    image: 'https://images.unsplash.com/photo-1586671267731-da2cf3ceeb80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2098&q=80',
+                    shelter: 'Happy Tails Rescue'
+                },
+                {
+                    id: 'd2',
+                    name: 'Luna',
+                    type: 'Dog',
+                    breed: 'Border Collie',
+                    age: '4 years',
+                    gender: 'Female',
+                    size: 'Medium',
+                    energy: 'Very High',
+                    temperament: ['Intelligent', 'Energetic', 'Loyal'],
+                    description: 'Luna is a brilliant Border Collie who needs an active owner. She excels at agility and loves learning new tricks.',
+                    image: 'https://images.unsplash.com/photo-1588943211346-0908a1fb0b01?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1035&q=80',
+                    shelter: 'Pawsitive Futures'
+                }
+            ],
+            cats: [
+                {
+                    id: 'c1',
+                    name: 'Whiskers',
+                    type: 'Cat',
+                    breed: 'Domestic Shorthair',
+                    age: '5 years',
+                    gender: 'Male',
+                    size: 'Small',
+                    energy: 'Moderate',
+                    temperament: ['Affectionate', 'Calm', 'Independent'],
+                    description: 'Whiskers is a sweet lap cat who enjoys quiet afternoons. He prefers being the only pet in the household.',
+                    image: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2043&q=80',
+                    shelter: 'Feline Friends'
+                },
+                {
+                    id: 'c2',
+                    name: 'Misty',
+                    type: 'Cat',
+                    breed: 'Siamese Mix',
+                    age: '1 year',
+                    gender: 'Female',
+                    size: 'Small',
+                    energy: 'High',
+                    temperament: ['Playful', 'Vocal', 'Curious'],
+                    description: 'Misty is a young, energetic cat who loves climbing and interactive toys. She gets along with other cats.',
+                    image: 'https://images.unsplash.com/photo-1533738363-b7f9aef128ce?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1035&q=80',
+                    shelter: 'Purrfect Match Rescue'
+                }
+            ]
+        };
+
+        // CHAT FUNCTIONS
+        function showTypingIndicator() {
+            const chatMessages = document.getElementById('chat-messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.id = 'typing-indicator';
+            typingDiv.innerHTML = `
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            `;
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const typing = document.getElementById('typing-indicator');
+            if (typing) typing.remove();
+        }
+
+        async function callGeminiAPI(userMessage, chatHistory) {
+            try {
+                const response = await fetch(`${BASE_URL}?key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        contents: [
+                            {
+                                parts: [
+                                    { text: SYSTEM_PROMPT },
+                                    ...chatHistory.map(msg => ({
+                                        text: msg.isUser ? `User: ${msg.text}` : `Assistant: ${msg.text}`
+                                    })),
+                                    { text: `User: ${userMessage}` }
+                                ]
+                            }
+                        ],
+                        generationConfig: {
+                            temperature: 0.7,
+                            topP: 0.95,
+                            topK: 40,
+                            maxOutputTokens: 1024
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API request failed with status ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data.candidates[0].content.parts[0].text;
+            } catch (error) {
+                console.error('Error calling Gemini API:', error);
+                return "I'm having trouble connecting to pet information. Please try again later or visit our website.";
+            }
+        }
+
+        function createPetCard(pet) {
+            return `
+                <div class="pet-card">
+                    <img src="${pet.image}" alt="${pet.name}">
+                    <h4>${pet.name} • ${pet.age} • ${pet.gender}</h4>
+                    <p><strong>${pet.breed}</strong> • ${pet.size} size • ${pet.energy} energy</p>
+                    <p>${pet.description}</p>
+                    <div class="tags">
+                        ${pet.temperament.map(trait => `<span class="tag">${trait}</span>`).join('')}
+                    </div>
+                    <p style="margin-top: 8px;"><i class="fas fa-home"></i> Available at: ${pet.shelter}</p>
+                    <button onclick="showPetDetails('${pet.id}')" style="margin-top: 8px; background: var(--secondary-color); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">More Details</button>
+                </div>
+            `;
+        }
+
+        async function getBotResponse(userMessage) {
+            // Check for direct pet type requests first
+            const lowerMsg = userMessage.toLowerCase();
+            
+            if (lowerMsg.includes('find me a dog') || lowerMsg.includes('show me dogs') || lowerMsg.includes('looking for a dog')) {
+                return getPetRecommendations('dogs');
+            }
+            
+            if (lowerMsg.includes('find me a cat') || lowerMsg.includes('show me cats') || lowerMsg.includes('looking for a cat')) {
+                return getPetRecommendations('cats');
+            }
+            
+            if (lowerMsg.includes('apartment pets') || lowerMsg.includes('small space')) {
+                return "For apartments, consider these pets:<br><br>" + 
+                       createPetCard(PET_DATABASE.cats.find(c => c.name === 'Whiskers')) + 
+                       createPetCard(PET_DATABASE.dogs.find(d => d.name === 'Buddy'));
+            }
+            
+            // Get chat history for context
+            const chatMessages = document.getElementById('chat-messages');
+            const messages = chatMessages.querySelectorAll('.message');
+            
+            const chatHistory = Array.from(messages).map(msg => {
+                return {
+                    text: msg.textContent || msg.innerText,
+                    isUser: msg.classList.contains('user-message')
+                };
+            }).slice(1); // Skip the initial welcome message
+            
+            // Call Gemini API with the user message and chat history
+            return await callGeminiAPI(userMessage, chatHistory);
+        }
+
+        function getPetRecommendations(petType) {
+            const pets = PET_DATABASE[petType];
+            if (!pets || pets.length === 0) {
+                return `I couldn't find any ${petType} available for adoption right now. Please check back later or try a different search.`;
+            }
+            
+            let response = `Here are some ${petType} available for adoption:<br><br>`;
+            pets.forEach(pet => {
+                response += createPetCard(pet);
+            });
+            response += `<br>Would you like more information about any of these ${petType}?`;
+            return response;
+        }
+
+        function addMessageToChat(message, isUser = false) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = isUser ? 'message user-message' : 'message bot-message';
+            messageDiv.innerHTML = message;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const userInput = document.getElementById('user-input');
+            const message = userInput.value.trim();
+            
+            if (!message) return;
+            
+            addMessageToChat(message, true);
+            userInput.value = '';
+            
+            showTypingIndicator();
+            
+            try {
+                const botResponse = await getBotResponse(message);
+                hideTypingIndicator();
+                addMessageToChat(botResponse);
+            } catch (error) {
+                hideTypingIndicator();
+                addMessageToChat("Sorry, I encountered an error. Please try again.");
+                console.error("Error:", error);
+            }
+        }
+
+        function sendQuickReply(reply) {
+            addMessageToChat(reply, true);
+            
+            showTypingIndicator();
+            
+            setTimeout(async () => {
+                try {
+                    const botResponse = await getBotResponse(reply);
+                    hideTypingIndicator();
+                    addMessageToChat(botResponse);
+                } catch (error) {
+                    hideTypingIndicator();
+                    addMessageToChat("Sorry, I encountered an error. Please try again.");
+                    console.error("Error:", error);
+                }
+            }, 500);
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        // Pet detail functions
+        function showPetDetails(petId) {
+            let pet;
+            
+            // Search dogs
+            pet = PET_DATABASE.dogs.find(d => d.id === petId);
+            if (!pet) {
+                // Search cats if not found in dogs
+                pet = PET_DATABASE.cats.find(c => c.id === petId);
+            }
+            
+            if (pet) {
+                const details = `
+                    <div class="pet-card">
+                        <img src="${pet.image}" alt="${pet.name}">
+                        <h4>${pet.name}'s Details</h4>
+                        <p><strong>Type:</strong> ${pet.type}</p>
+                        <p><strong>Breed:</strong> ${pet.breed}</p>
+                        <p><strong>Age:</strong> ${pet.age}</p>
+                        <p><strong>Gender:</strong> ${pet.gender}</p>
+                        <p><strong>Size:</strong> ${pet.size}</p>
+                        <p><strong>Energy Level:</strong> ${pet.energy}</p>
+                        <p><strong>Description:</strong> ${pet.description}</p>
+                        <div class="tags">
+                            ${pet.temperament.map(trait => `<span class="tag">${trait}</span>`).join('')}
+                        </div>
+                        <p><strong>Shelter:</strong> ${pet.shelter}</p>
+                        <button onclick="showAdoptionForm('${pet.id}')" style="margin-top: 8px; background: var(--secondary-color); color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; width: 100%;">Adopt ${pet.name}</button>
+                    </div>
+                `;
+                addMessageToChat(details);
+            }
+        }
+
+        function showAdoptionForm(petId) { 
+            const form = `
+                <div class="pet-card">
+                    <h4>Adoption Interest Form</h4>
+                    <p>Please provide some information to start the adoption process:</p>
+                    <form id="adoption-form">
+                        <input type="hidden" id="pet-id" value="${petId}">
+                        <div style="margin-bottom: 8px;">
+                            <label style="display: block; margin-bottom: 4px; font-size: 12px;">Your Name</label>
+                            <input type="text" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ddd;" required>
+                        </div>
+                        <div style="margin-bottom: 8px;">
+                            <label style="display: block; margin-bottom: 4px; font-size: 12px;">Email</label>
+                            <input type="email" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ddd;" required>
+                        </div>
+                        <div style="margin-bottom: 8px;">
+                            <label style="display: block; margin-bottom: 4px; font-size: 12px;">Phone</label>
+                            <input type="tel" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ddd;" required>
+                        </div>
+                        <div style="margin-bottom: 8px;">
+                            <label style="display: block; margin-bottom: 4px; font-size: 12px;">Why are you interested in this pet?</label>
+                            <textarea style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ddd; min-height: 60px;" required></textarea>
+                        </div>
+                        <button type="submit" style="margin-top: 8px; background: var(--secondary-color); color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; width: 100%;">Submit Application</button>
+                    </form>
+                </div>
+            `;
+            addMessageToChat(form);
+            
+            // Add form submission handler
+            setTimeout(() => {
+                document.getElementById('adoption-form')?.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    addMessageToChat("Thank you for your interest! A shelter representative will contact you within 24 hours.");
+                });
+            }, 100);
+        }
+
+        // Footer link functions
+        function showShelterInfo() {
+            const info = `
+                <div class="pet-card">
+                    <h4>Our Partner Shelters</h4>
+                    <p>We work with these wonderful organizations:</p>
+                    <ul style="margin-left: 16px;">
+                        <li><strong>Happy Tails Rescue</strong> - Specializing in dogs</li>
+                        <li><strong>Feline Friends</strong> - Cat rescue and adoption</li>
+                        <li><strong>Pawsitive Futures</strong> - All animal rescue</li>
+                        <li><strong>Purrfect Match Rescue</strong> - Cat adoption center</li>
+                    </ul>
+                    <p>All our partners are no-kill shelters with thorough adoption processes.</p>
+                </div>
+            `;
+            addMessageToChat(info);
+        }
+
+        function showAdoptionProcess() {
+            const info = `
+                <div class="pet-card">
+                    <h4>Adoption Process</h4>
+                    <p>Our adoption process ensures pets find the right forever homes:</p>
+                    <ol style="margin-left: 16px;">
+                        <li><strong>Application:</strong> Submit an adoption interest form</li>
+                        <li><strong>Interview:</strong> Shelter staff will contact you</li>
+                        <li><strong>Meet & Greet:</strong> Visit the pet in person</li>
+                        <li><strong>Home Check:</strong> Virtual or in-person home visit</li>
+                        <li><strong>Adoption:</strong> Finalize paperwork and bring your pet home!</li>
+                    </ol>
+                    <p>Typical process takes 3-7 days.</p>
+                </div>
+            `;
+            addMessageToChat(info);
+        }
+
+        function showContact() {
+            const info = `
+                <div class="pet-card">
+                    <h4>Contact Us</h4>
+                    <p>Have questions? Reach out to our team:</p>
+                    <p><i class="fas fa-phone"></i> <strong>Phone:</strong> (555) 123-4567</p>
+                    <p><i class="fas fa-envelope"></i> <strong>Email:</strong> adopt@pawsandhearts.org</p>
+                    <p><i class="fas fa-map-marker-alt"></i> <strong>Address:</strong> 123 Pet Lane, Anytown, USA</p>
+                    <p>We're available 9am-5pm daily to help you find your perfect pet!</p>
+                </div>
+            `;
+            addMessageToChat(info);
+        }
+
+        // Initialize chat with welcome message
+        setTimeout(() => {
+            document.querySelector('.chat-container').style.animation = 'fadeInUp 0.5s forwards';
+        }, 300);
+    </script>
+</body>
+</html>
