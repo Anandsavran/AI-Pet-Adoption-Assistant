@@ -11,4 +11,7 @@ H uses HTML, CSS and JavaScript for the frontent and Gemini API for intelligent 
 2) 
    a) Built user HTML and CSS
    b) The UI includes
-        **.** A chat bubble layout
+   
+        1) A chat bubble layout
+        2) Animations (fade-in, typing indicator)
+         
