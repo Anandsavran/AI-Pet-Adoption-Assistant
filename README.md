@@ -5,3 +5,9 @@ The goal of this project is to make pet adoption easier, friendlier and smarter 
 H uses HTML, CSS and JavaScript for the frontent and Gemini API for intelligent chatbot responses.
 
 **System Architecture**
+
+*Components:*
+1) User Interface (Frontent)
+   a) Built user HTML and CSS
+   b) The UI includes
+        **.**A chat bubble layout
