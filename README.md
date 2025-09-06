@@ -74,3 +74,20 @@ Final response : Cards are shown back to the user.
 
 **Feature Breakdown**
 
+(1) Quick replies : Buttons like, Find a dog, Find a cat, Adoption Tips.
+(2) Pet cards : Visually attractive cards display :
+               (a) Pet name, image, age, breed etc.
+               (b) shelter and adoption link.
+(3) Adoption Form : Simple form inside chat interface: Name, Email, Phone, Reason for adopting.
+(4) Footer Menu : Mini navigations like for shelter info, adoption process, contact details.
+
+**AI Assistant Logic**
+**Gemini API Prompt Design:**
+     (a) Instructs the modle to be informative, helpful.
+     (b) Ensures replies format: Pet info core tips.
+
+**Chat context Maintenance**
+     (a) Saves past questions as follow-ups make sense (like "tell me more about luna")
+**Fallback Handking**
+     (a) If unsure, the AI asks clarying questions.
+
