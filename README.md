@@ -48,6 +48,7 @@ H uses HTML, CSS and JavaScript for the frontent and Gemini API for intelligent 
    +------------+
    |    User    |
    +------------+
+   
           |
    +-----------------+               +-----------------------+
    | Chat Interface  |     <----->   |  Gemini AI Response   |
