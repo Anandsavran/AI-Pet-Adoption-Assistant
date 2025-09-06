@@ -82,12 +82,14 @@ Final response : Cards are shown back to the user.
 (4) Footer Menu : Mini navigations like for shelter info, adoption process, contact details.
 
 **AI Assistant Logic**
+
 **Gemini API Prompt Design:**
      (a) Instructs the modle to be informative, helpful.
      (b) Ensures replies format: Pet info core tips.
 
 **Chat context Maintenance**
      (a) Saves past questions as follow-ups make sense (like "tell me more about luna")
+     
 **Fallback Handking**
      (a) If unsure, the AI asks clarying questions.
 
