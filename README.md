@@ -48,7 +48,6 @@ H uses HTML, CSS and JavaScript for the frontent and Gemini API for intelligent 
    +------------+
    |    User    |
    +------------+
-   
           |
    +-----------------+               +-----------------------+
    | Chat Interface  |     <----->   |  Gemini AI Response   |
@@ -66,3 +65,12 @@ H uses HTML, CSS and JavaScript for the frontent and Gemini API for intelligent 
 User -> Chat interface : input preferences
 
 Interface <--> Gemini AI: If not found in DB, gets response form Gemini.
+
+Interface -> Pet recommendation logic: Matches query to pets.
+
+Logic -> Mock DB: Retrieves cord details.
+
+Final response : Cards are shown back to the user.
+
+**Feature Breakdown**
+
