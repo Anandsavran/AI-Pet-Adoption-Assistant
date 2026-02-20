@@ -86,7 +86,7 @@ Final response : Cards are shown back to the user.
 
 **AI Assistant Logic**
 
-**Gemini API Prompt Design:**
+**Gemini API Prompt Design:** 
 
      (a) Instructs the modle to be informative, helpful.
      (b) Ensures replies format: Pet info core tips.
