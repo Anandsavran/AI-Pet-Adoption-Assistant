@@ -60,7 +60,7 @@ H uses HTML, CSS and JavaScript for the frontent and Gemini API for intelligent 
    +----------------------------+
    |  Pet Data (MOck DB)        |
    +----------------------------+
-
+ 
 
 User -> Chat interface : input preferences
 
