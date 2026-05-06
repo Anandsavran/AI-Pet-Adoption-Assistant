@@ -1,4 +1,4 @@
-# Paws & Hearts - AI-Pet-Adoption-Assistant
+# Paws & Hearts - AI-Pet-Adoption-Assistant 
 **Project Overview**
 
 The goal of this project is to make pet adoption easier, friendlier and smarter using artificial intelligence. It stimulates a virtual assistant that can: 
