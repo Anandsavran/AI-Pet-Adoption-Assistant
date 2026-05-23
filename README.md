@@ -3,7 +3,7 @@
 
 The goal of this project is to make pet adoption easier, friendlier and smarter using artificial intelligence. It stimulates a virtual assistant that can: 
 
-(a) Understand user queries about pets. 
+(a) Understand user queries about pets.   
     
 (b) Suggest pets based on preference like breed, size, energy level.  
 
