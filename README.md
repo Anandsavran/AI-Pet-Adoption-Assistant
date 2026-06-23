@@ -15,7 +15,7 @@ H uses HTML, CSS and JavaScript for the frontent and Gemini API for intelligent 
 
 **System Architecture**
 
-*Components:*
+*Components:* 
 1. User Interface (Frontent)
    a) Built user HTML and CSS
    b) The UI includes
