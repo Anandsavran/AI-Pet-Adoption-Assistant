@@ -1,5 +1,10 @@
 <div align="center">
 
+<!-- HEADER BANNER -->
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:1a1a2e,50:16213e,100:0f3460&height=200&section=header&text=Paws%20Hearts&fontSize=38&fontColor=4fc3f7&fontAlignY=38&desc=&descAlignY=58&descColor=90caf9&animation=fadeIn" width="100%"/>
+
+<div align="center">
+
 <img src="https://img.shields.io/badge/🐾-Paws%20%26%20Hearts-ff6b6b?style=for-the-badge&labelColor=fff0f0" alt="Paws & Hearts"/>
 
 # 🐾 Paws & Hearts — AI Pet Adoption Assistant
