@@ -183,13 +183,6 @@ git checkout -b feature/your-feature-name
 git commit -m "Add: your feature description"
 git push origin feature/your-feature-name
 ```
-
----
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
-
 ---
 
 <div align="center">
