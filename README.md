@@ -1,5 +1,5 @@
 <div align="center">
-  
+   
 <!-- HEADER BANNER -->     
 <img src="https://capsule-render.vercel.app/api?type=waving&color=0:1a1a2e,50:16213e,100:0f3460&height=200&section=header&text=Paws%20Hearts&fontSize=38&fontColor=4fc3f7&fontAlignY=38&desc=Paws%20&%20Hearts%20AI%20Pet%20Adoption%20Assistant&descAlignY=58&descColor=90caf9&animation=fadeIn" width="100%"/>
  
